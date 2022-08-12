@@ -9,6 +9,7 @@ import {
 
 class Sky extends Mesh {
   static SkyShader: any
+  isSky: boolean
   constructor() {
     const shader = Sky.SkyShader
 

@@ -3,16 +3,14 @@ import * as THREE from "three"
 
 function Sea() {
   const matWaves: any = new THREE.MeshStandardMaterial({
-    //color:0x307ddd,
-    transparent: true,
-    opacity: 0,
+    color: "green",
     /* @ts-ignore */
     shading: THREE.SmoothShading
   })
 
   let geo = new THREE.PlaneBufferGeometry(
-    120,
-    120,
+    240,
+    240,
     window.innerWidth / 12,
     window.innerHeight / 12
   )

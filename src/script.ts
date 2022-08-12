@@ -60,11 +60,9 @@ assets.loadQueued().then(() => {
   //   distortionScale: 1,
   //   fog: webgl.scene.fog !== undefined
   // })
+  const w = Sea()
 
-  const sea = Sea()
-  sea.rotation.x = -Math.PI / 2
-
-  const water = new Water(sea.geometry, {
+  const water = new Water(w.geometry, {
     textureWidth: 1024,
     textureHeight: 1024,
     waterNormals: new THREE.TextureLoader().load(
@@ -81,8 +79,12 @@ assets.loadQueued().then(() => {
   })
 
   webgl.scene.add(water)
-
   water.rotation.x = -Math.PI / 2
+
+  const sea = Sea()
+  sea.rotation.x = -Math.PI / 2
+  sea.position.y = -1
+  webgl.scene.add(sea)
 
   // Skybox
   const sky: any = new Sky()
@@ -128,7 +130,7 @@ assets.loadQueued().then(() => {
   addEffects()
   ;(async () => {
     const { model }: any = await loadModel()
-    model.position.set(1, 2, 0)
+    model.position.set(1, 2.1, 0)
     model.scale.set(0.075, 0.075, 0.075)
     webgl.scene.add(model)
     let x = 0
@@ -142,13 +144,13 @@ assets.loadQueued().then(() => {
   const simplex = SimplexNoise.createNoise4D()
 
   function animatePlane() {
-    let gArray = sea.geometry.attributes.position.array
+    let gArray = water.geometry.attributes.position.array
     const time = Date.now() * 0.0002
     for (let i = 0; i < gArray.length; i += 3) {
       // @ts-ignore
-      gArray[i + 2] = simplex(gArray[i] / 6, gArray[i + 1] / 6, time, 0) * 0.5
+      gArray[i + 2] = simplex(gArray[i] / 6, gArray[i + 1] / 6, time, 0) * 0.85
     }
-    sea.geometry.attributes.position.needsUpdate = true
+    water.geometry.attributes.position.needsUpdate = true
     // plane.geometry.computeBoundingSphere();
   }
 

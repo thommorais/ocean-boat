@@ -89,7 +89,7 @@ class Water extends Mesh {
         {
           normalSampler: { value: null },
           mirrorSampler: { value: null },
-          alpha: { value: 0.5 },
+          alpha: { value: 1.5 },
           time: { value: 0.0 },
           size: { value: 1.0 },
           distortionScale: { value: 5.0 },
@@ -206,6 +206,7 @@ class Water extends Mesh {
       vertexShader: mirrorShader.vertexShader,
       uniforms: UniformsUtils.clone(mirrorShader.uniforms),
       transparent: true,
+      opacity: 0.5,
       lights: true,
       side: side,
       fog: fog

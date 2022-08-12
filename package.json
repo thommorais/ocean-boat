@@ -10,6 +10,7 @@
     "lil-gui": "^0.17.0",
     "p-limit": "^4.0.0",
     "postprocessing": "^6.28.2",
+    "simplex-noise": "^4.0.0",
     "stats.js": "^0.17.0",
     "three": "^0.141.0"
   },

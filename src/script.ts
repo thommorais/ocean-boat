@@ -6,6 +6,9 @@ import { Water } from "./water"
 import assets from "./utils/assets"
 import { addLights } from "./scene/lights"
 import { addEffects } from "./scene/effects"
+import * as SimplexNoise from "simplex-noise"
+
+import Sea from "./setupWater"
 
 import loadModel from "./scene/model"
 
@@ -19,6 +22,7 @@ const webgl = new Experience({
   gui: false,
   postprocessing: true
 })
+
 assets.loadQueued().then(() => {
   /**
    * Camera
@@ -36,12 +40,33 @@ assets.loadQueued().then(() => {
   webgl.orbitControls!.enablePan = false
   webgl.orbitControls!.enableDamping = true
 
-  // Water
-  const waterGeometry = new THREE.PlaneGeometry(10000, 10000)
+  /* @ts-ignore */
 
-  const water = new Water(waterGeometry, {
-    textureWidth: 512,
-    textureHeight: 512,
+  // Water
+  // const waterGeometry = new THREE.PlaneGeometry(10000, 10000)
+
+  // const water = new Water(waterGeometry, {
+  //   textureWidth: 512,
+  //   textureHeight: 512,
+  //   waterNormals: new THREE.TextureLoader().load(
+  //     "textures/water/waternormals.jpg",
+  //     function (texture) {
+  //       texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+  //     }
+  //   ),
+  //   sunDirection: new THREE.Vector3(),
+  //   sunColor: 0xffffff,
+  //   waterColor: 0x001e0f,
+  //   distortionScale: 1,
+  //   fog: webgl.scene.fog !== undefined
+  // })
+
+  const sea = Sea()
+  sea.rotation.x = -Math.PI / 2
+
+  const water = new Water(sea.geometry, {
+    textureWidth: 1024,
+    textureHeight: 1024,
     waterNormals: new THREE.TextureLoader().load(
       "textures/water/waternormals.jpg",
       function (texture) {
@@ -51,13 +76,13 @@ assets.loadQueued().then(() => {
     sunDirection: new THREE.Vector3(),
     sunColor: 0xffffff,
     waterColor: 0x001e0f,
-    distortionScale: 2,
+    distortionScale: 0.15,
     fog: webgl.scene.fog !== undefined
   })
 
-  water.rotation.x = -Math.PI / 2
-
   webgl.scene.add(water)
+
+  water.rotation.x = -Math.PI / 2
 
   // Skybox
   const sky: any = new Sky()
@@ -103,8 +128,8 @@ assets.loadQueued().then(() => {
   addEffects()
   ;(async () => {
     const { model }: any = await loadModel()
-    model.position.set(1, 1.4, 0)
-    model.scale.set(0.05, 0.05, 0.05)
+    model.position.set(1, 2, 0)
+    model.scale.set(0.075, 0.075, 0.075)
     webgl.scene.add(model)
     let x = 0
     const max = 0.2
@@ -114,10 +139,24 @@ assets.loadQueued().then(() => {
       model.rotation.x = xx
     })
   })()
+  const simplex = SimplexNoise.createNoise4D()
 
-  webgl.events.tick.on(() => {
+  function animatePlane() {
+    let gArray = sea.geometry.attributes.position.array
+    const time = Date.now() * 0.0002
+    for (let i = 0; i < gArray.length; i += 3) {
+      // @ts-ignore
+      gArray[i + 2] = simplex(gArray[i] / 6, gArray[i + 1] / 6, time, 0) * 0.5
+    }
+    sea.geometry.attributes.position.needsUpdate = true
+    // plane.geometry.computeBoundingSphere();
+  }
+
+  webgl.events.tick.on((dt) => {
     // @ts-ignore: Unreachable code erro
-    water.material.uniforms.time.value += 1.0 / 60.0
+    // water.material.uniforms.time.value += 1.0 / 120.0
+    // sea.moveWaves()
+    animatePlane()
   })
 
   /**

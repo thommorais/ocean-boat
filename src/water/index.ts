@@ -41,7 +41,8 @@ class Water extends Mesh {
       options.textureHeight !== undefined ? options.textureHeight : 512
 
     const clipBias = options.clipBias !== undefined ? options.clipBias : 0.0
-    const alpha = options.alpha !== undefined ? options.alpha : 1.0
+    const alpha = options.alpha !== undefined ? options.alpha : 0.75
+
     const time = options.time !== undefined ? options.time : 0.0
     const normalSampler =
       options.waterNormals !== undefined ? options.waterNormals : null
@@ -88,10 +89,10 @@ class Water extends Mesh {
         {
           normalSampler: { value: null },
           mirrorSampler: { value: null },
-          alpha: { value: 1.0 },
+          alpha: { value: 0.5 },
           time: { value: 0.0 },
           size: { value: 1.0 },
-          distortionScale: { value: 20.0 },
+          distortionScale: { value: 5.0 },
           textureMatrix: { value: new Matrix4() },
           sunColor: { value: new Color(0x7f7f7f) },
           sunDirection: { value: new Vector3(0.70707, 0.70707, 0) },
@@ -189,7 +190,7 @@ class Water extends Mesh {
 
 					float theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );
 					float rf0 = 0.3;
-					float reflectance = rf0 + ( 1.0 - rf0 ) * pow( ( 1.0 - theta ), 5.0 );
+					float reflectance = rf0 + ( 1.0 - rf0 ) * pow( ( 1.0 - theta ), 10.0 );
 					vec3 scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ) * waterColor;
 					vec3 albedo = mix( ( sunColor * diffuseLight * 0.3 + scatter ) * getShadowMask(), ( vec3( 0.1 ) + reflectionSample * 0.9 + reflectionSample * specularLight ), reflectance);
 					vec3 outgoingLight = albedo;
@@ -204,6 +205,7 @@ class Water extends Mesh {
       fragmentShader: mirrorShader.fragmentShader,
       vertexShader: mirrorShader.vertexShader,
       uniforms: UniformsUtils.clone(mirrorShader.uniforms),
+      transparent: true,
       lights: true,
       side: side,
       fog: fog
